@@ -1,0 +1,29 @@
+mode: train
+
+model: "resnet18"
+train_path: data/data.txt
+test_path: data/data.txt
+valid_path: data/data.txt
+
+epoch: 100
+batch_size: 2
+
+optim:
+  lr: 0.0001
+  beta_1: 0.9
+  beta_2: 0.999
+
+dataset:
+  max_width: 256
+  max_height: 256
+  labels: 
+    - HG
+    - HT
+    - TR
+    - CTH
+    - BD
+    - VH
+    - CTQ
+    - DQT
+    - KS
+    - CVN
