@@ -2,6 +2,7 @@ from sklearn.metrics import classification_report
 from torch.utils.tensorboard import SummaryWriter
 from torch.utils.data import DataLoader
 from src.models.resnet18 import ResNet18
+from src.models.restnet50 import ResNet50
 from src.dataset import ImageDataset
 from torch.nn import CrossEntropyLoss
 from src.utils import load_data
@@ -53,6 +54,9 @@ class Trainer():
         logging.info(f'model: {self.config["model"]}')
         if self.config["model"] == "resnet18":
             self.model = ResNet18()
+        elif self.config["model"] == "resnet50":
+            self.model = ResNet50()
+            
         model_parameters = filter(lambda p: p.requires_grad, self.model.parameters())
         params = sum([np.prod(p.size()) for p in model_parameters])
         logging.info(f"num params: {params}")

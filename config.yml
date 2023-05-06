@@ -1,6 +1,7 @@
 mode: train
 
-model: "resnet18"
+# model: "resnet18"
+model: "resnet50"
 train_path: data/data.txt
 test_path: data/data.txt
 valid_path: data/data.txt

@@ -11,3 +11,7 @@
 ``` shell 
 python main.py
 ```
+4. Run the following script to visualize training results (only train/valid loss)
+``` shell 
+tensorboard --logdir=path/to/logs/directory
+```
