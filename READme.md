@@ -1,12 +1,13 @@
-## deep learning project
+## Deep learning project
 
-### current model/architecture:
-1. resnet18
-2. resnet50
+### Current model/architecture:
+1. Resnet18
+2. Resnet50
 
-### how to run:
-1. prepare data in similar format in data directory.
-2. run
+### How to run:
+1. Prepare data in similar format in data directory.
+2. Edit model in config.yml file
+3. Run
 ``` shell 
 python main.py
 ```
