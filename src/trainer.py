@@ -13,7 +13,18 @@ import numpy as np
 import logging
 import torch
 import os
-logging.basicConfig(format='%(process)d-%(asctime)s: %(message)s', level=logging.DEBUG)
+
+current_time = datetime.now()
+current_time = current_time.strftime("%d-%m-%Y_%H:%M:%S")
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.FileHandler(f"logs/log_{current_time}.log"),
+        logging.StreamHandler()
+    ]
+)
 
 class Trainer():
     def __init__(self, config) -> None:
@@ -45,8 +56,7 @@ class Trainer():
             batch_size=self.config["batch_size"],
             shuffle=True,
             pin_memory=True,
-            drop_last=False
-        )
+            drop_last=False)
         
         return img_dataloader
     
@@ -131,8 +141,7 @@ class Trainer():
             if (epoch+1) % self.config["save_ckpt_per_n_epochs"] == 0:
                 train_loss = np.array(train_losses).mean()
                 valid_results, valid_loss = self.evaluate(self.model, self.valid_dl)
-                logging.info("validation result")
-                print(valid_results)
+                logging.info(f"validation result\n{valid_results}")
                 
                 self.writer.add_scalars('loss', {"train":train_loss, "valid":valid_loss}, epoch)
         
