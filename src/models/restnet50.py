@@ -62,8 +62,6 @@ class Block(nn.Module):
 
       if self.i_downsample is not None:
           identity = self.i_downsample(identity)
-      print(x.shape)
-      print(identity.shape)
       x += identity
       x = self.relu(x)
       return x
@@ -88,19 +86,24 @@ class ResNet50(nn.Module):
         
         self.avgpool = nn.AdaptiveAvgPool2d((1,1))
         self.cls_head = nn.Linear(512*ResBlock.expansion, num_classes*2)
+        self.dropout = nn.Dropout(0.1)
         
     def forward(self, x):
         x = self.relu(self.batch_norm1(self.conv1(x)))
         x = self.max_pool(x)
 
         x = self.layer1(x)
+        x = self.dropout(x)
         x = self.layer2(x)
+        x = self.dropout(x)
         x = self.layer3(x)
+        x = self.dropout(x)
         x = self.layer4(x)
         
         x = self.avgpool(x)
         x = x.reshape(x.shape[0], -1)
         x = self.cls_head(x)
+        x = self.dropout(x)
         x = x.reshape(x.size(0), 10, 2)
         
         return x

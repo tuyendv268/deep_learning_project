@@ -125,6 +125,7 @@ class Trainer():
         for epoch in range(self.config["epoch"]):
             train_tqdm = tqdm(self.train_dl, desc=f"epoch={epoch}")
             train_losses = []
+            self.model.train()
             for i, batch in enumerate(train_tqdm):
                 self.optimizer.zero_grad()
                 images, labels = batch
@@ -144,6 +145,7 @@ class Trainer():
                 })
             if (epoch+1) % self.config["save_ckpt_per_n_epochs"] == 0:
                 train_loss = np.array(train_losses).mean()
+                self.model.eval()
                 valid_results, valid_loss = self.evaluate(self.model, self.valid_dl)
                 logging.info(f"validation result\n{valid_results}")
                 
@@ -155,6 +157,7 @@ class Trainer():
     def evaluate(self, model, dataloader):
         y_trues, y_predicts = [], []
         losses = []
+        
         for i, batch in enumerate(dataloader):
             images, labels = batch
             preds = model(images)
