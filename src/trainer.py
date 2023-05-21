@@ -45,14 +45,15 @@ class Trainer():
             train_df, valid_df = train_df.reset_index(), valid_df.reset_index()
             
             logging.info("prepare data for train, valid, test")
-            self.train_dl = self.prepare_dataloader(train_df)
-            self.valid_dl = self.prepare_dataloader(valid_df)
-            self.test_dl = self.prepare_dataloader(test_df)
+            self.train_dl = self.prepare_dataloader(train_df, mode="train")
+            self.valid_dl = self.prepare_dataloader(valid_df, mode="val")
+            self.test_dl = self.prepare_dataloader(test_df, mode="val")
 
-    def prepare_dataloader(self, datas):
+    def prepare_dataloader(self, datas, mode):
         img_dataset = ImageDataset(
             datas=datas,
-            config=self.config["dataset"])
+            config=self.config["dataset"],
+            mode=mode)
         
         img_dataloader = DataLoader(
             img_dataset,

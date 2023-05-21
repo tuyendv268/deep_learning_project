@@ -1,15 +1,9 @@
 from torch.utils.data import Dataset
 import torch
-from torchvision.io import read_image
-from torchvision.utils import make_grid
-from torchvision import transforms
-import torchvision
-import PIL
 from imgaug import augmenters as iaa
 import imgaug as ia
 from torchvision.io import read_image
 import numpy as np
-import imageio
 
 class ImgAugTransform:
     def __init__(self):
@@ -29,7 +23,7 @@ class ImgAugTransform:
         return self.aug.augment_image(img)
 
 class ImageDataset(Dataset):
-    def __init__(self, datas, config) -> None:
+    def __init__(self, datas, config, mode) -> None:
         super(ImageDataset, self).__init__()
         
         self.datas = datas
@@ -37,6 +31,7 @@ class ImageDataset(Dataset):
         self.max_width = config["max_width"]
         self.max_height = config["max_height"]
         self.aug_img = ImgAugTransform()
+        self.mode = mode
         
     def __len__(self):
         return self.datas.shape[0]
@@ -45,10 +40,12 @@ class ImageDataset(Dataset):
         image = read_image(image_path)
         image = image[:, 0:self.max_height, 0:self.max_width]
         label = torch.tensor(label).unsqueeze(-1)
-        
-        image = self.aug_img(image.permute(1, 2, 0))
-        image = torch.tensor(image)
-        image = image.permute(2, 0, 1)
+        if self.mode == "train":
+            image = self.aug_img(image.permute(1, 2, 0))
+            image = torch.tensor(image)
+            image = image.permute(2, 0, 1)
+        elif self.mode == "val":
+            pass
 
         return image.float(), label
     
