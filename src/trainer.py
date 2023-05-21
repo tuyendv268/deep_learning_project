@@ -1,5 +1,6 @@
 from sklearn.metrics import classification_report
 from torch.utils.tensorboard import SummaryWriter
+from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader
 from src.models.resnet18 import ResNet18
 from src.models.restnet50 import ResNet50
@@ -39,7 +40,9 @@ class Trainer():
         if self.config["mode"] == "train":
             train_df = load_data(self.config["train_path"])
             test_df = load_data(self.config["test_path"])
-            valid_df = load_data(self.config["valid_path"])
+            # valid_df = load_data(self.config["valid_path"])
+            train_df, valid_df = train_test_split(train_df, test_size=self.config["valid_size"], random_state=42)
+            train_df, valid_df = train_df.reset_index(), valid_df.reset_index()
             
             logging.info("prepare data for train, valid, test")
             self.train_dl = self.prepare_dataloader(train_df)
