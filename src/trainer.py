@@ -16,7 +16,7 @@ import torch
 import os
 
 current_time = datetime.now()
-current_time = current_time.strftime("%d-%m-%Y_%H:%M:%S")
+current_time = current_time.strftime("%d-%m-%Y_%H-%M-%S")
 
 logging.basicConfig(
     level=logging.INFO,
