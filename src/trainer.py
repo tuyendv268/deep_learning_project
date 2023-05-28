@@ -1,5 +1,6 @@
 from sklearn.metrics import classification_report
 from torch.utils.tensorboard import SummaryWriter
+from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader
 from src.models.resnet18 import ResNet18
 from src.models.restnet50 import ResNet50
@@ -15,7 +16,7 @@ import torch
 import os
 
 current_time = datetime.now()
-current_time = current_time.strftime("%d-%m-%Y_%H:%M:%S")
+current_time = current_time.strftime("%d-%m-%Y_%H-%M-%S")
 
 logging.basicConfig(
     level=logging.INFO,
@@ -40,17 +41,20 @@ class Trainer():
         if self.config["mode"] == "train":
             train_df = load_data(self.config["train_path"])
             test_df = load_data(self.config["test_path"])
-            valid_df = load_data(self.config["valid_path"])
+            # valid_df = load_data(self.config["valid_path"])
+            train_df, valid_df = train_test_split(train_df, test_size=self.config["valid_size"], random_state=42)
+            train_df, valid_df = train_df.reset_index(), valid_df.reset_index()
             
             logging.info("prepare data for train, valid, test")
-            self.train_dl = self.prepare_dataloader(train_df)
-            self.valid_dl = self.prepare_dataloader(valid_df)
-            self.test_dl = self.prepare_dataloader(test_df)
+            self.train_dl = self.prepare_dataloader(train_df, mode="train")
+            self.valid_dl = self.prepare_dataloader(valid_df, mode="val")
+            self.test_dl = self.prepare_dataloader(test_df, mode="val")
 
-    def prepare_dataloader(self, datas):
+    def prepare_dataloader(self, datas, mode):
         img_dataset = ImageDataset(
             datas=datas,
-            config=self.config["dataset"])
+            config=self.config["dataset"],
+            mode=mode)
         
         img_dataloader = DataLoader(
             img_dataset,
@@ -122,6 +126,7 @@ class Trainer():
         for epoch in range(self.config["epoch"]):
             train_tqdm = tqdm(self.train_dl, desc=f"epoch={epoch}")
             train_losses = []
+            self.model.train()
             for i, batch in enumerate(train_tqdm):
                 self.optimizer.zero_grad()
                 images, labels = batch
@@ -145,6 +150,7 @@ class Trainer():
                 })
             if (epoch+1) % self.config["save_ckpt_per_n_epochs"] == 0:
                 train_loss = np.array(train_losses).mean()
+                self.model.eval()
                 valid_results, valid_loss = self.evaluate(self.model, self.valid_dl)
                 logging.info(f"validation result\n{valid_results}")
                 
@@ -156,6 +162,7 @@ class Trainer():
     def evaluate(self, model, dataloader):
         y_trues, y_predicts = [], []
         losses = []
+        
         for i, batch in enumerate(dataloader):
             images, labels = batch
             preds = model(images)
