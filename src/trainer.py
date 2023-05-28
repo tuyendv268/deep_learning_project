@@ -30,6 +30,7 @@ class Trainer():
     def __init__(self, config) -> None:
         self.config = config
         
+        self.device = "cpu" if not torch.cuda.is_available() else "cuda"
         self.init_model()
         self.init_optim()
         self.prepare_diretories_and_logger()
@@ -63,9 +64,9 @@ class Trainer():
     def init_model(self):
         logging.info(f'model: {self.config["model"]}')
         if self.config["model"] == "resnet18":
-            self.model = ResNet18()
+            self.model = ResNet18().to(self.device)
         elif self.config["model"] == "resnet50":
-            self.model = ResNet50()
+            self.model = ResNet50().to(self.device)
             
         model_parameters = filter(lambda p: p.requires_grad, self.model.parameters())
         params = sum([np.prod(p.size()) for p in model_parameters])
@@ -124,6 +125,10 @@ class Trainer():
             for i, batch in enumerate(train_tqdm):
                 self.optimizer.zero_grad()
                 images, labels = batch
+                
+                images = images.to(self.device)
+                labels = labels.to(self.device)
+                
                 preds = self.model(images)
                 
                 preds = preds.reshape(preds.size(0) * preds.size(1), -1)
@@ -134,7 +139,7 @@ class Trainer():
                 
                 self.optimizer.step()
                 
-                train_losses.append(loss.item())
+                train_losses.append(loss.cpu().detach().item())
                 train_tqdm.set_postfix({
                     "loss":np.mean(np.array(train_losses))
                 })
