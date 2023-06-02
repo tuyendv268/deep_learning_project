@@ -1,0 +1,47 @@
+mode: train
+
+model: "resnet50" # "resnet18"
+
+contrastive_path: data/datafull.txt
+train_path: data/data.txt
+test_path: data/data.txt
+# valid_path: data/data.txt
+valid_size: 0.2
+
+load_contrastive: False
+load_classification: False
+
+save_ckpt_per_n_epochs: 10
+eval_per_n_epochs: 1
+
+ckpt_dir: checkpoints
+log_dir: logs
+
+epoch: 30
+batch_size: 8
+
+optim:
+  lr: 0.001
+  beta_1: 0.9
+  beta_2: 0.999
+  weight_decay: 0.00001
+
+net:
+  num_labels: 10
+  feature_dim: 64
+  temperature: 0.07
+
+dataset:
+  max_width: 256
+  max_height: 256
+  labels:
+    - HG
+    - HT
+    - TR
+    - CTH
+    - BD
+    - VH
+    - CTQ
+    - DQT
+    - KS
+    - CVN
